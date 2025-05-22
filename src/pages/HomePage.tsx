@@ -6,7 +6,7 @@ import { Sparkles, Upload, UserPlus } from 'lucide-react';
 
 const HomePage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-[#0d0c0c] via-65% to-blue-700/80 to-90% text-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-black via-[#0d0c0c] via-65% to-blue-700/80 to-90% text-white flex flex-col">
       {/* Hero Section */}
       <div className="container mx-auto px-6 py-20 flex-1 flex flex-col items-center justify-center text-center">
         <div className="mb-10 animate-fadeIn">
