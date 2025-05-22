@@ -62,12 +62,58 @@ const HomePage: React.FC = () => {
             </div>
           ))}
         </div>
-      </div>
 
+        {/* How It Works */}
+        <div className="mt-24 max-w-5xl w-full text-center">
+          <h2 className="text-3xl font-bold mb-6">How It Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
+            {[
+              {
+                step: '1',
+                title: 'Upload Your Paper',
+                desc: 'Drop your PDF research paper or document directly into our system.',
+              },
+              {
+                step: '2',
+                title: 'AI Processes It',
+                desc: 'Our models analyze, summarize, and extract insights from your paper.',
+              },
+              {
+                step: '3',
+                title: 'Interact & Learn',
+                desc: 'Use the chatbot, get summaries, extract code, and more—all in real time.',
+              },
+            ].map((item, i) => (
+              
+              <div
+                key={i}
+                className="bg-[#0d0c0c]/70 border border-gray-700 rounded-xl p-6 hover:scale-105 transition-transform duration-300"
+              >
+                <div className="text-4xl mb-3">{item.step}</div>
+                <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
+                <p className="text-gray-400">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        
+        {/* Built for Every Researcher */}
+        <div className="mt-24 text-center max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">Built for Every Researcher</h2>
+          <p className="text-gray-400 text-lg mb-6">
+            Whether you're a first-year undergrad, a PhD scholar, or a professor shaping the next generation, our tool is designed to adapt to your needs and elevate your research game.
+          </p>
+          <p className="text-orange-400 italic">Your curiosity is limitless—your assistant should be too.</p>
+        </div>
+
+        
+    
       {/* Footer */}
-      <footer className="text-center text-gray-500 py-6 border-t border-gray-800">
-        &copy; {new Date().getFullYear()} <span className="text-orange-500">ResearchAI</span>. Built with ❤️ for curious minds.
+      <footer className="text-center text-gray-300 py-6 border-t border-gray-800">
+        &copy; {new Date().getFullYear()} <span className="text-orange-500">ResearchAI</span>. Built by Abhinay
       </footer>
+    </div>
     </div>
   );
 };
