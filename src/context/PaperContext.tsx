@@ -89,6 +89,8 @@ const uploadPaper = useCallback(async (file: File) => {
     setIsLoading(true);
     
     try {
+      console.log("Paper ID passed to sendMessage: ",currentPaper.id);
+
       // Make API call to get bot response
       const botResponse = await sendMessage(currentPaper.id, message);
       setChatMessages((prev) => [...prev, botResponse]);

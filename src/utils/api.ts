@@ -48,15 +48,22 @@ export const processPaper = async (content: string, action: string): Promise<str
 };
 
 
-// Send a message (dummy, unless you build real chat)
-export const sendMessage = async (paperId: string, message: string): Promise<ChatMessage> => {
-  return {
-    id: `bot-${Date.now()}`,
-    sender: 'bot',
-    content: `Response for message: "${message}"`,
-    timestamp: new Date().toISOString(),
-  };
+
+export const sendMessage = async (paperId: string, message: string) => {
+  const response = await paperApi.post(`/${paperId}/chat`, 
+    { message }, // Request body
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  return response.data; // Assumes backend returns a ChatMessage object
 };
+
+
+
 
 /* ------------------- User Authentication ------------------- */
 
