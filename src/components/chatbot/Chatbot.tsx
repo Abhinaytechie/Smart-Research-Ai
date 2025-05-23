@@ -54,8 +54,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
             </div>
           ) : (
             <>
-              {chatMessages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
+              {chatMessages.map((message,index) => (
+                <ChatMessage key={message.id|| index} message={message} />
               ))}
               <div ref={messagesEndRef} />
             </>

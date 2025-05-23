@@ -4,6 +4,7 @@ import Button from '../common/Button';
 import axios from 'axios';
 import { usePaperContext } from '../../context/PaperContext';
 
+
 interface ActionButtonsProps {
   onChatOpen: () => void;
 }
@@ -81,6 +82,10 @@ const handleAction = async (action: string) => {
   ];
 
   return (
+    
+           
+         
+           
     <div className="w-full">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {actions.map((action) => (
@@ -105,6 +110,8 @@ const handleAction = async (action: string) => {
         ))}
       </div>
     </div>
+    
+           
   );
 };
 

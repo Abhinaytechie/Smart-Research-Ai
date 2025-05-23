@@ -17,10 +17,15 @@ export interface ChatMessage {
 }
 
 export interface User {
-  
   username: string;
-  
+  token: string;
+  email?: string;
+  roles?: string[];
+  bookmarks: Paper[];    // Assuming Paper is your paper type
+
 }
+
+
 
 export interface AuthContextType {
   user: User | null;

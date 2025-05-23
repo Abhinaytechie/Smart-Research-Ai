@@ -4,12 +4,15 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);  // Fixed typo here
+  const [isScrolled, setIsScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState<boolean>(() => {
-    return localStorage.getItem('loggedIn') === 'true';
-  });
+  return !!localStorage.getItem('token');  // true if token exists
+});
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+
   const desktopDropdownRef = useRef<HTMLDivElement>(null);
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -22,6 +25,13 @@ const Navbar: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  useEffect(() => {
+  const handleStorageChange = () => {
+    setLoggedIn(!!localStorage.getItem('token'));
+  };
+  window.addEventListener('storage', handleStorageChange);
+  return () => window.removeEventListener('storage', handleStorageChange);
+}, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -41,7 +51,8 @@ const Navbar: React.FC = () => {
         (desktopDropdownRef.current && !desktopDropdownRef.current.contains(target)) &&
         (mobileDropdownRef.current && !mobileDropdownRef.current.contains(target))
       ) {
-        setDropdownOpen(false);
+        setDesktopDropdownOpen(false);
+        setMobileDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -57,13 +68,16 @@ const Navbar: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
-    console.log('Logging out...');
-    localStorage.removeItem('loggedIn');
-    setLoggedIn(false);
-    setDropdownOpen(false);
-    setIsMobileMenuOpen(false);
-    navigate('/auth');
-  };
+  localStorage.removeItem('token');  // remove token, not loggedIn flag
+  setLoggedIn(false);
+  // close dropdowns and redirect
+  navigate('/auth');
+};
+
+
+  // For profile icon initials (optional)
+  // Here just "U" for user, you can customize as per username
+  const initial = "U";
 
   return (
     <header
@@ -114,19 +128,21 @@ const Navbar: React.FC = () => {
             ) : (
               <div className="relative" ref={desktopDropdownRef}>
                 <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  onClick={() => setDesktopDropdownOpen(!desktopDropdownOpen)}
                   className="p-2 rounded-full hover:bg-gray-800 transition focus:outline-none"
                   aria-label="Profile menu"
                 >
-                  <User size={28} />
+                  <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold">
+                    {initial}
+                  </div>
                 </button>
 
-                {dropdownOpen && (
+                {desktopDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-gray-900 rounded shadow-lg py-2 z-50">
                     <Link
                       to="/profile"
                       className="block px-4 py-2 hover:bg-gray-700 transition"
-                      onClick={() => setDropdownOpen(false)}
+                      onClick={() => setDesktopDropdownOpen(false)}
                     >
                       Profile
                     </Link>
@@ -190,20 +206,22 @@ const Navbar: React.FC = () => {
           ) : (
             <div className="relative" ref={mobileDropdownRef}>
               <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
                 className="flex items-center p-3 rounded-lg w-full hover:bg-gray-800 transition focus:outline-none"
                 aria-label="Profile menu"
               >
-                <User size={24} />
+                <div className="w-7 h-7 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold">
+                  {initial}
+                </div>
                 <span className="ml-2 text-gray-400">Profile</span>
               </button>
 
-              {dropdownOpen && (
+              {mobileDropdownOpen && (
                 <div className="mt-2 w-full bg-gray-900 rounded shadow-lg py-2 z-50">
                   <Link
                     to="/profile"
                     className="block px-4 py-2 hover:bg-gray-700 transition"
-                    onClick={() => setDropdownOpen(false)}
+                    onClick={() => setMobileDropdownOpen(false)}
                   >
                     Profile
                   </Link>

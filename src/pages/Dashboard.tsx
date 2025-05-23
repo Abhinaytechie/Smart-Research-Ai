@@ -117,6 +117,7 @@ const Dashboard: React.FC = () => {
 
           {result.content && (
             <div className="mt-8">
+              
               <ResultCard
                 title={`✨ ${result.type?.charAt(0).toUpperCase()}${result.type?.slice(1)} Result`}
                 content={result.content}

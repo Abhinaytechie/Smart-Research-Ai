@@ -71,9 +71,17 @@ export const login = async (username: string, password: string): Promise<User> =
   const response = await userApi.post('/login', {
     username,
     password,
-  },{withCredentials: true});
-  return response.data;
+  }, { withCredentials: true });
+
+  const { token, username: returnedUsername } = response.data;
+
+  return {
+    username: returnedUsername,
+    token,
+    bookmarks: []
+  };
 };
+
 
 export const signup = async (username: string, password: string): Promise<User> => {
   const response = await userApi.post('/signup', {
@@ -82,3 +90,21 @@ export const signup = async (username: string, password: string): Promise<User> 
   });
   return response.data;
 };
+
+export const fetchUserDetails = async (token: string) => {
+  const response = await userApi.get('/details', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data; // { bookmarks: [...], history: [...] }
+};
+// Bookmark a paper
+// Bookmark a paper
+export const bookmarkPaper = async (paperId: string) => {
+  await userApi.post('/bookmark', { paperId });
+};
+
+// Unbookmark a paper
+export const unbookmarkPaper = async (paperId: string) => {
+  await userApi.post('/unbookmark', { paperId });
+};
+

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, X } from 'lucide-react';
 import Button from './Button';
+import ReactMarkdown from 'react-markdown';
 
 interface ResultCardProps {
   title: string;
@@ -56,7 +57,9 @@ const ResultCard: React.FC<ResultCardProps> = ({ title, content, onClose }) => {
           expanded ? 'max-h-[500px] overflow-y-auto' : 'max-h-0'
         }`}
       >
-        <div className="p-4 text-gray-300 whitespace-pre-wrap">{content}</div>
+       <div className="prose max-w-none p-4  text-grey-300 rounded-md whitespace-pre-wrap">
+             <ReactMarkdown>{content}</ReactMarkdown>
+           </div>
       </div>
     </div>
   );

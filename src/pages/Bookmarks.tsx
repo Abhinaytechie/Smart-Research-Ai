@@ -1,27 +1,42 @@
 import React from 'react';
 import { usePaperContext } from '../context/PaperContext';
+import { useAuth } from '../context/AuthContext';
 import { BookmarkIcon } from 'lucide-react';
 import { Paper } from '../types';
 import { Link } from 'react-router-dom';
 
 const Bookmarks: React.FC = () => {
-  const { papers, uploadPaper } = usePaperContext();
-  
-  // Filter only bookmarked papers
-  const bookmarkedPapers = papers.filter(paper => paper.bookmarked);
+  const { papers, setCurrentPaper } = usePaperContext();
+  const { user, removeBookmark } = useAuth();
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p>Please log in to view your bookmarks.</p>
+      </div>
+    );
+  }
+
+  // Filter papers that are bookmarked by the user
+  const bookmarkedPapers = user.bookmarks;
 
   const handlePaperClick = (paper: Paper) => {
-    uploadPaper(paper);
+    setCurrentPaper && setCurrentPaper(paper);
   };
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  // Remove bookmark when icon clicked, prevent bubbling up
+  const handleUnbookmark = (paperId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    removeBookmark(paperId);
+  };
+
+  // Format ISO date string to readable format
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
-  };
 
   return (
     <div className="min-h-screen bg-black text-white pt-16 pb-20">
@@ -75,10 +90,12 @@ const Bookmarks: React.FC = () => {
                     )}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      {formatDate(paper.uploadDate)}
-                    </span>
-                    <BookmarkIcon size={18} className="text-orange-500 fill-orange-500" />
+                    <span className="text-xs text-gray-500">{formatDate(paper.uploadDate)}</span>
+                    <BookmarkIcon
+                      size={18}
+                      className="text-orange-500 fill-orange-500 cursor-pointer"
+                      onClick={(e) => handleUnbookmark(paper.id, e)}
+                    />
                   </div>
                 </div>
               </div>

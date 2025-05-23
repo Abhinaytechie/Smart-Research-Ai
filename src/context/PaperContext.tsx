@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 import { Paper, ChatMessage, PaperContextType } from '../types';
-import { processPaper, sendMessage ,uploadPaperAPI} from '../utils/api';
+import { processPaper, sendMessage ,uploadPaperAPI,bookmarkPaper,unbookmarkPaper} from '../utils/api';
+
 
 // Create context with default values
 const PaperContext = createContext<PaperContextType>({} as PaperContextType);
@@ -48,23 +49,36 @@ const uploadPaper = useCallback(async (file: File) => {
     
 
   // Bookmark or unbookmark a paper
-  const bookmarkPaper = useCallback((id: string) => {
-    // Update papers list
-    setPapers((prevPapers) =>
-      prevPapers.map((paper) =>
-        paper.id === id
-          ? { ...paper, bookmarked: !paper.bookmarked }
-          : paper
+  const bookmarkPaper = useCallback(async (id: string) => {
+  if (!currentPaper) return;
+
+  // Find if currently bookmarked
+  const isBookmarked = papers.find(p => p.id === id)?.bookmarked;
+
+  try {
+    if (!isBookmarked) {
+      // Call backend to add bookmark
+      await bookmarkPaper(id);
+    } else {
+      // Call backend to remove bookmark
+      await unbookmarkPaper(id);
+    }
+
+    // If success, update state
+    setPapers(prevPapers =>
+      prevPapers.map(paper =>
+        paper.id === id ? { ...paper, bookmarked: !isBookmarked } : paper
       )
     );
-    
-    // Update current paper if it's the one being bookmarked
-    if (currentPaper && currentPaper.id === id) {
-      setCurrentPaper((prev) =>
-        prev ? { ...prev, bookmarked: !prev.bookmarked } : null
-      );
+
+    if (currentPaper.id === id) {
+      setCurrentPaper(prev => prev ? { ...prev, bookmarked: !isBookmarked } : null);
     }
-  }, [currentPaper]);
+  } catch (err) {
+    console.error("Failed to update bookmark:", err);
+    // Optionally show user error feedback
+  }
+}, [currentPaper, papers]);
 
   // Clear current paper
   const clearCurrentPaper = useCallback(() => {
@@ -85,6 +99,7 @@ const uploadPaper = useCallback(async (file: File) => {
       timestamp: new Date().toISOString(),
     };
     
+    
     setChatMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
     
@@ -93,7 +108,11 @@ const uploadPaper = useCallback(async (file: File) => {
 
       // Make API call to get bot response
       const botResponse = await sendMessage(currentPaper.id, message);
-      setChatMessages((prev) => [...prev, botResponse]);
+      const botMessage: ChatMessage = {
+      ...botResponse,
+      timestamp: new Date().toISOString(),
+    };
+      setChatMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       // Add error message
       const errorMessage: ChatMessage = {
@@ -148,6 +167,7 @@ const clearResult = useCallback(() => {
     isProcessing,
     processingType,
     result,
+    setCurrentPaper,
     uploadPaper,
     bookmarkPaper,
     clearCurrentPaper,

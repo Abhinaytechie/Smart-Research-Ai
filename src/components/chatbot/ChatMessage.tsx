@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { ChatMessage as ChatMessageType } from '../../types';
+import ReactMarkdown from 'react-markdown';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -14,7 +15,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       messageRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
-
+  
   return (
     <div 
       ref={messageRef}
@@ -23,18 +24,27 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       <div 
         className={`max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-3 ${
           isUser 
-            ? 'bg-orange-500 text-black rounded-tr-sm' 
+            ? 'bg-orange-500 text-black text-bold rounded-tr-sm' 
             : 'bg-gray-800 text-white rounded-tl-sm'
         }`}
+
       >
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        
+
+        
+       <div className="prose max-w-none p-1  text-white-900 rounded-md whitespace-pre-wrap">
+      <ReactMarkdown>{message.content}</ReactMarkdown>
+    </div>
+
         <div 
-          className={`text-xs mt-1 ${isUser ? 'text-black/70' : 'text-gray-400'}`}
+          className={`text-xs mt-1 ${isUser ? 'text-black/90' : 'text-gray-400'}`}
         >
-          {new Date(message.timestamp).toLocaleTimeString([], { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          })}
+         {message.timestamp && !isNaN(new Date(message.timestamp).getTime())
+    ? new Date(message.timestamp).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    : 'Invalid time'}
         </div>
       </div>
     </div>
