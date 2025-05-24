@@ -139,6 +139,12 @@ const Navbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
+                 onClick={(e) => {
+    if (isActive(link.path)) {
+      e.preventDefault(); // Prevent default routing
+      navigate(0); // Force reload of current route
+    }
+  }}
                 className={`px-4 py-2 rounded-lg flex items-center transition-all duration-300 ${
                   isActive(link.path)
                     ? 'text-orange-500'
@@ -228,6 +234,12 @@ const Navbar: React.FC = () => {
             <Link
               key={link.path}
               to={link.path}
+               onClick={(e) => {
+    if (isActive(link.path)) {
+      e.preventDefault(); // Prevent default routing
+      navigate(0); // Force reload of current route
+    }
+  }}
               className={`py-3 px-4 rounded-lg flex items-center transition-all duration-300 ${
                 isActive(link.path)
                   ? 'bg-gray-800 text-orange-500'
