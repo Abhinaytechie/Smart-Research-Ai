@@ -1,8 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { PaperProvider } from './context/PaperContext';
-import { AuthProvider } from './context/AuthContext';
-import { useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
 import Dashboard from './pages/Dashboard';
 import Bookmarks from './pages/Bookmarks';
@@ -16,8 +15,76 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   if (!user) return <Navigate to="/auth" />;
   return <>{children}</>;
 };
-const storedUser= localStorage.getItem('username');
+
+const storedUser = localStorage.getItem('username');
 const userName = storedUser ?? "User";
+
+const AppRoutes = () => {
+  const location = useLocation(); // ✅ Use hook here
+
+  return (
+    <Routes>
+      <Route
+        path="/auth"
+        element={
+          <>
+            <Navbar />
+            <Auth />
+          </>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <>
+              <Navbar />
+              <UserProfile />
+            </>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <>
+            <Navbar />
+            <HomePage />
+          </>
+        }
+      />
+      <Route
+        path="/bookmarks"
+        element={
+          <>
+            <Navbar />
+            <Bookmarks />
+          </>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <>
+            <Navbar />
+            <Dashboard key={location.key} /> {/* ✅ Use location.key to remount */}
+          </>
+        }
+      />
+      <Route
+        path="/history"
+        element={
+          <ProtectedRoute>
+            <>
+              <Navbar />
+              <History />
+            </>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+};
 
 function App() {
   return (
@@ -25,68 +92,7 @@ function App() {
       <AuthProvider>
         <PaperProvider>
           <div className="min-h-screen bg-black text-white">
-            <Routes>
-              <Route path="/auth" element={
-                <>
-                      <Navbar />
-                      <Auth />
-                    </>
-                } />
-                
-      
-      <Route 
-  path="/profile" 
-  element={
-    <ProtectedRoute>
-      <>
-        <Navbar />
-        <UserProfile />
-      </>
-    </ProtectedRoute>
-  }
-/>
-
-    
-              <Route
-                path="/"
-                element={<>
-                <Navbar/><HomePage/>
-              </>
-              }/>
-              <Route
-                path="/bookmarks"
-                element={
-                  
-                    <>
-                      <Navbar />
-                      <Bookmarks />
-                    </>
-                 
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                 
-                    <>
-                      <Navbar />
-                      <Dashboard />
-                    </>
-                  
-                }
-              />
-              <Route
-                path="/history"
-                element={
-                  <ProtectedRoute>
-                    <>
-                      <Navbar />
-                      <History />
-                    </>
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
+            <AppRoutes />
           </div>
         </PaperProvider>
       </AuthProvider>
