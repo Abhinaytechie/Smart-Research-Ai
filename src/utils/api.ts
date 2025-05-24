@@ -2,11 +2,11 @@
 import axios from 'axios';
 import { Paper, ChatMessage, User } from '../types';
 const paperApi = axios.create({
-  baseURL: 'http://localhost:8080/api/paper',
+  baseURL: 'https://smart-research-ai.onrender.com/api/paper',
 });
 
 const userApi = axios.create({
-  baseURL: 'http://localhost:8080/user',
+  baseURL: 'https://smart-research-ai.onrender.com/user',
 });
 
 /* ------------------- Paper APIs ------------------- */
