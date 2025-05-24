@@ -88,12 +88,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       scheduleAutoLogout(payload.exp * 1000);
     }
   } catch (err: any) {
-    if (err.response?.status === 409) {
-      setError("User already exists. Please choose a different username.");
-    } else {
-      setError(err instanceof Error ? err.message : 'Failed to signup');
-    }
-  } finally {
+  if (err.response && err.response.data && err.response.data.error) {
+    setError(err.response.data.error); // shows "Username already exists"
+  } else if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError("Failed to signup");
+  }
+} finally {
     setIsLoading(false);
   }
 };
