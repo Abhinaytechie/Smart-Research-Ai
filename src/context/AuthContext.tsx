@@ -75,25 +75,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Signup - similar to login but maybe no bookmarks yet
-  const signup = async (username: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const userData = await signupApi(username, password);
-      setUser(userData);
-      localStorage.setItem('token', userData.token);
-     
-      // Setup auto logout based on token exp
-      const payload = JSON.parse(atob(userData.token.split('.')[1]));
-      if (payload.exp) {
-        scheduleAutoLogout(payload.exp * 1000);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to signup');
-    } finally {
-      setIsLoading(false);
+ const signup = async (username: string, password: string) => {
+  setIsLoading(true);
+  setError(null);
+  try {
+    const userData = await signupApi(username, password); // expects token in response
+    setUser(userData);
+    localStorage.setItem('token', userData.token);
+
+    const payload = JSON.parse(atob(userData.token.split('.')[1]));
+    if (payload.exp) {
+      scheduleAutoLogout(payload.exp * 1000);
     }
-  };
+  } catch (err: any) {
+    if (err.response?.status === 409) {
+      setError("User already exists. Please choose a different username.");
+    } else {
+      setError(err instanceof Error ? err.message : 'Failed to signup');
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   // On mount, check token and load user data + bookmarks/history
   useEffect(() => {
