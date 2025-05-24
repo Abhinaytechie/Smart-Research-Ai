@@ -34,7 +34,11 @@ export interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   error: string | null;
+  addBookmark: (paperId: string) => Promise<void>;
+  removeBookmark: (paperId: string) => Promise<void>;
+  updateUserBookmarks: () => void;
 }
+
 
 export interface PaperContextType {
   currentPaper?: Paper | null;
@@ -53,4 +57,5 @@ export interface PaperContextType {
   sendChatMessage: (message: string) => Promise<void>;
   processAction: (action: string) => Promise<void>;
   clearResult: () => void;
+  setCurrentPaper: (paper: Paper) => void;
 }

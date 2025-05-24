@@ -99,12 +99,22 @@ export const fetchUserDetails = async (token: string) => {
 };
 // Bookmark a paper
 // Bookmark a paper
-export const bookmarkPaper = async (paperId: string) => {
-  await userApi.post('/bookmark', { paperId });
+paperApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+export const bookmarkPaperApi = async (id: string) => {
+  await paperApi.post('/bookmark', { paperId: id });
+  
 };
 
+
+
 // Unbookmark a paper
-export const unbookmarkPaper = async (paperId: string) => {
-  await userApi.post('/unbookmark', { paperId });
+export const unbookmarkPaperApi = async (id: string) => {
+  await paperApi.post('/unbookmark', { paperId:id });
 };
 

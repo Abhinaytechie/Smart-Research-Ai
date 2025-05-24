@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 import { Paper, ChatMessage, PaperContextType } from '../types';
-import { processPaper, sendMessage ,uploadPaperAPI,bookmarkPaper,unbookmarkPaper} from '../utils/api';
+import { processPaper, sendMessage ,uploadPaperAPI, bookmarkPaperApi,unbookmarkPaperApi} from '../utils/api';
 
 
 // Create context with default values
@@ -52,22 +52,22 @@ const uploadPaper = useCallback(async (file: File) => {
   const bookmarkPaper = useCallback(async (id: string) => {
   if (!currentPaper) return;
 
-  // Find if currently bookmarked
-  const isBookmarked = papers.find(p => p.id === id)?.bookmarked;
+  const paper = papers.find(p => p.id === id);
+  if (!paper) return;
+
+  const isBookmarked = paper.bookmarked;
 
   try {
     if (!isBookmarked) {
-      // Call backend to add bookmark
-      await bookmarkPaper(id);
+      await bookmarkPaperApi(id);
     } else {
-      // Call backend to remove bookmark
-      await unbookmarkPaper(id);
+      await unbookmarkPaperApi(id);
     }
 
-    // If success, update state
+    // Update state only after success
     setPapers(prevPapers =>
-      prevPapers.map(paper =>
-        paper.id === id ? { ...paper, bookmarked: !isBookmarked } : paper
+      prevPapers.map(p =>
+        p.id === id ? { ...p, bookmarked: !isBookmarked } : p
       )
     );
 
@@ -76,9 +76,9 @@ const uploadPaper = useCallback(async (file: File) => {
     }
   } catch (err) {
     console.error("Failed to update bookmark:", err);
-    // Optionally show user error feedback
   }
 }, [currentPaper, papers]);
+
 
   // Clear current paper
   const clearCurrentPaper = useCallback(() => {

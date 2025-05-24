@@ -1,20 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Upload, BookmarkIcon, History, X, LogIn, User } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Menu, Upload, BookmarkIcon, History, X, LogIn } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [loggedIn, setLoggedIn] = useState<boolean>(() => {
-  return !!localStorage.getItem('token');  // true if token exists
-});
-
-
+  const [loggedIn, setLoggedIn] = useState(() => !!localStorage.getItem('token'));
   const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
 
   const desktopDropdownRef = useRef<HTMLDivElement>(null);
+  const desktopDropdownBtnRef = useRef<HTMLButtonElement>(null);
+
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownBtnRef = useRef<HTMLButtonElement>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,39 +24,76 @@ const Navbar: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Sync login state on localStorage change (for multi-tab)
   useEffect(() => {
-  const handleStorageChange = () => {
-    setLoggedIn(!!localStorage.getItem('token'));
-  };
-  window.addEventListener('storage', handleStorageChange);
-  return () => window.removeEventListener('storage', handleStorageChange);
+    const handleStorageChange = () => setLoggedIn(!!localStorage.getItem('token'));
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+  useEffect(() => {
+  const handleLogin = () => setLoggedIn(true);
+  window.addEventListener('login', handleLogin);
+  return () => window.removeEventListener('login', handleLogin);
 }, []);
 
-  // Close mobile menu on route change
+
+  // Close all menus on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setDesktopDropdownOpen(false);
+    setMobileDropdownOpen(false);
   }, [location.pathname]);
 
-  // Sync loggedIn state with localStorage
-  useEffect(() => {
-    localStorage.setItem('loggedIn', String(loggedIn));
-  }, [loggedIn]);
-
-  // Close dropdown if clicked outside (desktop or mobile dropdown)
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       if (
-        (desktopDropdownRef.current && !desktopDropdownRef.current.contains(target)) &&
-        (mobileDropdownRef.current && !mobileDropdownRef.current.contains(target))
+        desktopDropdownOpen &&
+        desktopDropdownRef.current &&
+        !desktopDropdownRef.current.contains(target) &&
+        desktopDropdownBtnRef.current &&
+        !desktopDropdownBtnRef.current.contains(target)
       ) {
         setDesktopDropdownOpen(false);
+        desktopDropdownBtnRef.current.focus();
+      }
+      if (
+        mobileDropdownOpen &&
+        mobileDropdownRef.current &&
+        !mobileDropdownRef.current.contains(target) &&
+        mobileDropdownBtnRef.current &&
+        !mobileDropdownBtnRef.current.contains(target)
+      ) {
         setMobileDropdownOpen(false);
+        mobileDropdownBtnRef.current.focus();
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [desktopDropdownOpen, mobileDropdownOpen]);
+
+  // Keyboard handlers for dropdown buttons
+  const handleDesktopKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setDesktopDropdownOpen((open) => !open);
+    } else if (e.key === 'Escape') {
+      setDesktopDropdownOpen(false);
+      desktopDropdownBtnRef.current?.focus();
+    }
+  };
+
+  const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setMobileDropdownOpen((open) => !open);
+    } else if (e.key === 'Escape') {
+      setMobileDropdownOpen(false);
+      mobileDropdownBtnRef.current?.focus();
+    }
+  };
 
   const navLinks = [
     { label: 'Dashboard', path: '/dashboard', icon: <Upload size={20} /> },
@@ -67,16 +103,14 @@ const Navbar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const handleLogout = () => {
-  localStorage.removeItem('token');  // remove token, not loggedIn flag
-  setLoggedIn(false);
-  // close dropdowns and redirect
-  navigate('/auth');
-};
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('token');
+    setLoggedIn(false);
+    setDesktopDropdownOpen(false);
+    setMobileDropdownOpen(false);
+    navigate('/auth');
+  }, [navigate]);
 
-
-  // For profile icon initials (optional)
-  // Here just "U" for user, you can customize as per username
   const initial = "U";
 
   return (
@@ -128,8 +162,12 @@ const Navbar: React.FC = () => {
             ) : (
               <div className="relative" ref={desktopDropdownRef}>
                 <button
+                  ref={desktopDropdownBtnRef}
                   onClick={() => setDesktopDropdownOpen(!desktopDropdownOpen)}
+                  onKeyDown={handleDesktopKeyDown}
                   className="p-2 rounded-full hover:bg-gray-800 transition focus:outline-none"
+                  aria-haspopup="true"
+                  aria-expanded={desktopDropdownOpen}
                   aria-label="Profile menu"
                 >
                   <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold">
@@ -137,23 +175,30 @@ const Navbar: React.FC = () => {
                   </div>
                 </button>
 
-                {desktopDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-40 bg-gray-900 rounded shadow-lg py-2 z-50">
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 hover:bg-gray-700 transition"
-                      onClick={() => setDesktopDropdownOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-700 transition"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                )}
+                <div
+                  className={`absolute right-0 mt-2 w-40 bg-gray-900 rounded shadow-lg py-2 z-50 transform transition-all duration-200 origin-top-right
+                  ${desktopDropdownOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
+                  role="menu"
+                  aria-hidden={!desktopDropdownOpen}
+                >
+                  <Link
+                    to="/profile" 
+                    className="block px-4 py-2 hover:bg-gray-700 transition"
+                    onClick={() => setDesktopDropdownOpen(false)}
+                    role="menuitem"
+                    tabIndex={desktopDropdownOpen ? 0 : -1}
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-700 transition"
+                    role="menuitem"
+                    tabIndex={desktopDropdownOpen ? 0 : -1}
+                  >
+                    Logout
+                  </button>
+                </div>
               </div>
             )}
           </nav>
@@ -163,6 +208,8 @@ const Navbar: React.FC = () => {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-lg text-gray-400 hover:text-orange-500 focus:outline-none"
+              aria-label="Toggle mobile menu"
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -172,10 +219,8 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Navigation */}
       <div
-        className={`md:hidden transition-all duration-300 ${
-          isMobileMenuOpen
-            ? 'max-h-60 opacity-100 border-b border-gray-800 bg-black'
-            : 'max-h-0 opacity-0 overflow-hidden'
+        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
+          isMobileMenuOpen ? 'max-h-96 opacity-100 border-b border-gray-800 bg-black' : 'max-h-0 opacity-0'
         }`}
       >
         <nav className="container mx-auto px-4 py-3 space-y-2">
@@ -206,8 +251,12 @@ const Navbar: React.FC = () => {
           ) : (
             <div className="relative" ref={mobileDropdownRef}>
               <button
+                ref={mobileDropdownBtnRef}
                 onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
+                onKeyDown={handleMobileKeyDown}
                 className="flex items-center p-3 rounded-lg w-full hover:bg-gray-800 transition focus:outline-none"
+                aria-haspopup="true"
+                aria-expanded={mobileDropdownOpen}
                 aria-label="Profile menu"
               >
                 <div className="w-7 h-7 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold">
@@ -216,23 +265,30 @@ const Navbar: React.FC = () => {
                 <span className="ml-2 text-gray-400">Profile</span>
               </button>
 
-              {mobileDropdownOpen && (
-                <div className="mt-2 w-full bg-gray-900 rounded shadow-lg py-2 z-50">
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 hover:bg-gray-700 transition"
-                    onClick={() => setMobileDropdownOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-700 transition"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+              <div
+                className={`mt-2 w-full bg-gray-900 rounded shadow-lg py-2 z-50 transform transition-all duration-200 origin-top
+                ${mobileDropdownOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
+                role="menu"
+                aria-hidden={!mobileDropdownOpen}
+              >
+                <Link
+                  to="/profile"
+                  className="block px-4 py-2 hover:bg-gray-700 transition"
+                  onClick={() => setMobileDropdownOpen(false)}
+                  role="menuitem"
+                  tabIndex={mobileDropdownOpen ? 0 : -1}
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-700 transition"
+                  role="menuitem"
+                  tabIndex={mobileDropdownOpen ? 0 : -1}
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           )}
         </nav>

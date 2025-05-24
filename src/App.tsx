@@ -9,12 +9,15 @@ import Bookmarks from './pages/Bookmarks';
 import History from './pages/History';
 import Auth from './pages/Auth';
 import HomePage from './pages/HomePage';
+import UserProfile from './pages/UserProfile';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/auth" />;
   return <>{children}</>;
 };
+const storedUser= localStorage.getItem('username');
+const userName = storedUser ?? "User";
 
 function App() {
   return (
@@ -29,6 +32,15 @@ function App() {
                       <Auth />
                     </>
                 } />
+                
+      
+      <Route 
+      path="/profile" 
+      element={
+      <UserProfile username={userName} 
+      />} 
+      />
+    
               <Route
                 path="/"
                 element={<>

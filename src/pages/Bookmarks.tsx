@@ -6,8 +6,8 @@ import { Paper } from '../types';
 import { Link } from 'react-router-dom';
 
 const Bookmarks: React.FC = () => {
-  const { papers, setCurrentPaper } = usePaperContext();
-  const { user, removeBookmark } = useAuth();
+  const { setCurrentPaper } = usePaperContext();
+  const { user, removeBookmark, addBookmark, updateUserBookmarks } = useAuth();
 
   if (!user) {
     return (
@@ -17,20 +17,23 @@ const Bookmarks: React.FC = () => {
     );
   }
 
-  // Filter papers that are bookmarked by the user
-  const bookmarkedPapers = user.bookmarks;
+  const bookmarkedPapers = user.bookmarks || [];
 
   const handlePaperClick = (paper: Paper) => {
-    setCurrentPaper && setCurrentPaper(paper);
+    setCurrentPaper?.(paper);
   };
 
-  // Remove bookmark when icon clicked, prevent bubbling up
-  const handleUnbookmark = (paperId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    removeBookmark(paperId);
-  };
+  const handleUnbookmark = async (paperId: string, e: React.MouseEvent) => {
+  e.stopPropagation();
+  await removeBookmark(paperId);
+};
 
-  // Format ISO date string to readable format
+const handleBookmark = async (paperId: string, e: React.MouseEvent) => {
+  e.stopPropagation();
+  await addBookmark(paperId);
+};
+
+
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -91,11 +94,19 @@ const Bookmarks: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">{formatDate(paper.uploadDate)}</span>
-                    <BookmarkIcon
-                      size={18}
-                      className="text-orange-500 fill-orange-500 cursor-pointer"
-                      onClick={(e) => handleUnbookmark(paper.id, e)}
-                    />
+                    {user.bookmarks.find(b => b.id === paper.id) ? (
+                      <BookmarkIcon
+                        size={18}
+                        className="text-orange-500 fill-orange-500 cursor-pointer"
+                        onClick={(e) => handleUnbookmark(paper.id, e)}
+                      />
+                    ) : (
+                      <BookmarkIcon
+                        size={18}
+                        className="text-gray-400 cursor-pointer"
+                        onClick={(e) => handleBookmark(paper.id, e)}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

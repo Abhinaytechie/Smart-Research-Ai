@@ -20,8 +20,9 @@ const Auth: React.FC = () => {
         await signup(username, password);
       }
       navigate('/');
-    } catch (err) {
-      console.error('Authentication error:', err);
+    } catch (err: any) {
+      console.error('Authentication error:', err.message || err);
+      // You can also set error state here if needed
     }
   };
 
@@ -29,9 +30,8 @@ const Auth: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="relative bg-gray-900/50 backdrop-blur-xl rounded-2xl border border-gray-800/50 p-8 shadow-2xl">
-          {/* Decorative elements */}
           <div className="absolute inset-0 rounded-2xl overflow-hidden">
-            <div className="absolute -inset-[500px] bg-orange-500/20 blur-[100px] " />
+            <div className="absolute -inset-[500px] bg-orange-500/20 blur-[100px]" />
           </div>
 
           <div className="relative">
@@ -45,7 +45,7 @@ const Auth: React.FC = () => {
               <p className="text-gray-400 mt-2">Your intelligent research companion</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl p-4 text-sm animate-fadeIn">
                   {error}
@@ -54,7 +54,7 @@ const Auth: React.FC = () => {
 
               <div className="space-y-4">
                 <div className="relative">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
                     Username
                   </label>
                   <div className="relative">
@@ -62,18 +62,21 @@ const Auth: React.FC = () => {
                       <User size={18} />
                     </div>
                     <input
+                      id="username"
+                      name="username"
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       className="w-full bg-gray-800/50 border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all duration-300"
                       placeholder="Enter your username"
                       required
+                      autoComplete="username"
                     />
                   </div>
                 </div>
 
                 <div className="relative">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                     Password
                   </label>
                   <div className="relative">
@@ -81,12 +84,15 @@ const Auth: React.FC = () => {
                       <Lock size={18} />
                     </div>
                     <input
+                      id="password"
+                      name="password"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full bg-gray-800/50 border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all duration-300"
                       placeholder="Enter your password"
                       required
+                      autoComplete={isLogin ? 'current-password' : 'new-password'}
                     />
                   </div>
                 </div>
@@ -107,6 +113,7 @@ const Auth: React.FC = () => {
               <button
                 onClick={() => setIsLogin(!isLogin)}
                 className="text-orange-400 hover:text-orange-300 text-sm transition-colors duration-300"
+                type="button"
               >
                 {isLogin
                   ? "Don't have an account? Sign up"
