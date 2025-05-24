@@ -9,6 +9,7 @@ import History from './pages/History';
 import Auth from './pages/Auth';
 import HomePage from './pages/HomePage';
 import UserProfile from './pages/UserProfile';
+import PaperDetails from './pages/PaperDetails';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -33,6 +34,8 @@ const AppRoutes = () => {
           </>
         }
       />
+      <Route path="/papers/:id" element={<PaperDetails />} />
+
       <Route
         path="/profile"
         element={

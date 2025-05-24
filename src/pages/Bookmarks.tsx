@@ -3,11 +3,12 @@ import { usePaperContext } from '../context/PaperContext';
 import { useAuth } from '../context/AuthContext';
 import { BookmarkIcon } from 'lucide-react';
 import { Paper } from '../types';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Bookmarks: React.FC = () => {
   const { setCurrentPaper } = usePaperContext();
-  const { user, removeBookmark, addBookmark, updateUserBookmarks } = useAuth();
+  const { user, removeBookmark, addBookmark } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) {
     return (
@@ -19,20 +20,27 @@ const Bookmarks: React.FC = () => {
 
   const bookmarkedPapers = user.bookmarks || [];
 
+  // Navigate to paper details page
   const handlePaperClick = (paper: Paper) => {
+    navigate(`/papers/${paper.id}`);
+  };
+
+  // Open paper in dashboard (set current paper and redirect)
+  const goToDashboardWithPaper = (paper: Paper, e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent card click navigation
     setCurrentPaper?.(paper);
+    navigate('/dashboard');
   };
 
   const handleUnbookmark = async (paperId: string, e: React.MouseEvent) => {
-  e.stopPropagation();
-  await removeBookmark(paperId);
-};
+    e.stopPropagation();
+    await removeBookmark(paperId);
+  };
 
-const handleBookmark = async (paperId: string, e: React.MouseEvent) => {
-  e.stopPropagation();
-  await addBookmark(paperId);
-};
-
+  const handleBookmark = async (paperId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await addBookmark(paperId);
+  };
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('en-US', {
@@ -92,7 +100,7 @@ const handleBookmark = async (paperId: string, e: React.MouseEvent) => {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-3">
                     <span className="text-xs text-gray-500">{formatDate(paper.uploadDate)}</span>
                     {user.bookmarks.find(b => b.id === paper.id) ? (
                       <BookmarkIcon
@@ -108,6 +116,14 @@ const handleBookmark = async (paperId: string, e: React.MouseEvent) => {
                       />
                     )}
                   </div>
+
+                  {/* New Button: Open in Dashboard */}
+                  <button
+                    onClick={(e) => goToDashboardWithPaper(paper, e)}
+                    className="w-full bg-orange-500 text-black rounded-md py-2 text-center hover:bg-orange-600 transition-colors"
+                  >
+                    Open in Dashboard
+                  </button>
                 </div>
               </div>
             ))}

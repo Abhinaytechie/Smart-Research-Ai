@@ -10,7 +10,10 @@ const userApi = axios.create({
 });
 
 /* ------------------- Paper APIs ------------------- */
-
+export const fetchPaperById = async (id: string): Promise<Paper> => {
+  const response = await paperApi.get(`/${id}`);
+  return response.data;
+};
 // Upload a paper
 export const uploadPaperAPI = async (formData: FormData): Promise<Paper> => {
   const response = await paperApi.post(`/upload`, formData, {
