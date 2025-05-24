@@ -16,12 +16,15 @@ const Auth: React.FC = () => {
     try {
       if (isLogin) {
         await login(username, password);
+        navigate('/');
       } else {
         await signup(username, password);
+        navigate('/auth');
       }
-      navigate('/');
+      
     } catch (err: any) {
       console.error('Authentication error:', err.message || err);
+      navigate('/auth');
       // You can also set error state here if needed
     }
   };

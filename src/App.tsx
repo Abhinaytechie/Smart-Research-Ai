@@ -35,11 +35,17 @@ function App() {
                 
       
       <Route 
-      path="/profile" 
-      element={
-      <UserProfile username={userName} 
-      />} 
-      />
+  path="/profile" 
+  element={
+    <ProtectedRoute>
+      <>
+        <Navbar />
+        <UserProfile />
+      </>
+    </ProtectedRoute>
+  }
+/>
+
     
               <Route
                 path="/"
