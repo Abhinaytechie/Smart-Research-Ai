@@ -15,12 +15,13 @@ const UserProfile: React.FC<UserProfileProps> = ({
   bio = "Passionate about technology, always eager to learn and grow.",
  
 }) => {
-  const getInitials = (name: string) => {
-    if (!name) return 'U';
-    const parts = name.trim().split(' ');
-    if (parts.length === 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  };
+  const getInitials = (name: string | undefined) => {
+  if (!name || typeof name !== 'string') return 'U';
+  const parts = name.trim().split(' ');
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+};
+
 
   const initials = getInitials(username);
 
