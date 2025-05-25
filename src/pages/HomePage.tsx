@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Hero Section */}
-      <div className="container mx-auto px-6 py-20 flex-1 flex flex-col items-center justify-center text-center">
+      <div className="container mx-auto px-4 py-20 flex-1 flex flex-col items-center justify-center text-center">
         <div className="mb-10 animate-fadeIn">
           <div className="inline-flex items-center px-3 py-1 bg-orange-600/20 border border-orange-500/30 text-sm rounded-full mb-6">
             <Sparkles className="w-4 h-4 mr-2 text-orange-500" />
