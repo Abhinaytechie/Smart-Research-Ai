@@ -5,14 +5,25 @@ import Button from '../components/common/Button';
 import { Sparkles, Upload, UserPlus } from 'lucide-react';
 
 const HomePage: React.FC = () => {
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  e.preventDefault();
+  const targetId = e.currentTarget.getAttribute('href')?.slice(1);
+  if (targetId) {
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-[#0d0c0c] via-65% to-blue-700/80 to-90% text-white flex flex-col relative">
       {/* Mobile Navigation Anchors */}
       <div className="md:hidden flex gap-4 justify-center text-sm mt-4 px-4">
-        <a href="#features" className="text-orange-400 underline">Features</a>
-        <a href="#how-it-works" className="text-orange-400 underline">How It Works</a>
-        <a href="#audience" className="text-orange-400 underline">Audience</a>
-      </div>
+  <a href="#features" onClick={handleAnchorClick} className="text-orange-400 underline">Features</a>
+  <a href="#how-it-works" onClick={handleAnchorClick} className="text-orange-400 underline">How It Works</a>
+  <a href="#audience" onClick={handleAnchorClick} className="text-orange-400 underline">Audience</a>
+</div>
+
 
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-20 flex-1 flex flex-col items-center justify-center text-center">
