@@ -19,17 +19,57 @@ const MarkdownPreviewer: React.FC = () => {
     setHtml(clean);
   }, [markdown]);
 
-  const downloadFile = () => {
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'research-notes.md';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+ const downloadFile = () => {
+  const rawHtml = marked.parse(markdown, { breaks: true, gfm: true });
+  const clean = DOMPurify.sanitize(rawHtml);
+
+  const fullHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Research Notes</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #0f0f0f;
+          color: white;
+          padding: 2rem;
+        }
+        pre {
+          background-color: #1a1a1a;
+          padding: 1rem;
+          overflow-x: auto;
+        }
+        code {
+          color: #ffa500;
+        }
+        h1, h2, h3 {
+          color: #ff8c00;
+        }
+        a {
+          color: #61dafb;
+        }
+      </style>
+    </head>
+    <body>
+      ${clean}
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob([fullHtml], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'research-notes.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 
   return (
     <>
