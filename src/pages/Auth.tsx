@@ -13,17 +13,18 @@ const Auth: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmedUsername = username.trim();
+
     try {
       if (isLogin) {
-        await login(username, password);
-        navigate('/');
+        await login(trimmedUsername, password);
       } else {
-        await signup(username, password);
-        navigate('/auth');
+        await signup(trimmedUsername, password);
       }
+      setPassword('');
     } catch (err: any) {
       console.error('Authentication error:', err.message || err);
-      navigate('/auth');
+      // Navigation handled by context; no need to navigate here
     }
   };
 
@@ -51,7 +52,11 @@ const Auth: React.FC = () => {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl p-4 text-sm animate-fadeIn">
+                <div
+                  role="alert"
+                  aria-live="assertive"
+                  className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl p-4 text-sm animate-fadeIn"
+                >
                   {error}
                 </div>
               )}
@@ -111,6 +116,7 @@ const Auth: React.FC = () => {
                 isLoading={isLoading}
                 icon={isLogin ? <LogIn size={18} /> : <UserPlus size={18} />}
                 className="py-3 font-semibold tracking-wide"
+                disabled={isLoading}
               >
                 {isLogin ? 'Sign In' : 'Create Account'}
               </Button>

@@ -1,15 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/common/Button';
 import { Sparkles, Upload, UserPlus } from 'lucide-react';
 
 const HomePage: React.FC = () => {
-  
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-[#0d0c0c] via-65% to-blue-700/80 to-90% text-white flex flex-col relative">
+    <div className="min-h-screen bg-gradient-to-b from-black via-[#0d0c0c] via-65% to-blue-700/80 text-white flex flex-col relative">
       
-
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-20 flex-1 flex flex-col items-center justify-center text-center">
         <div className="mb-10 animate-fadeIn">
@@ -37,7 +34,7 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Feature Highlights */}
-        <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 animate-fadeInUp scroll-mt-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 animate-fadeInUp scroll-mt-16">
           {[
             {
               title: 'Summarize Instantly',

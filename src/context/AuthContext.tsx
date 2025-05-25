@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { User, AuthContextType } from '../types';
 import { usePaperContext } from '../context/PaperContext'; // adjust path as needed
-
+import { useNavigate } from 'react-router-dom';
 import {
   login as loginApi,
   signup as signupApi,
@@ -23,6 +23,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
 
   // To hold the timeout ID for auto logout so we can clear if needed
   const logoutTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -49,30 +51,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Login function with fetching bookmarks + history
-  const login = async (username: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const userData = await loginApi(username, password); // { username, token, ... }
-      const userDetails = await fetchUserDetails(userData.token); // { bookmarks: [...], history: [...] }
+ 
 
-      setUser({ ...userData, bookmarks: userDetails.bookmarks });
-      localStorage.setItem('token', userData.token);
-      localStorage.setItem('username',userData.username);
-      window.dispatchEvent(new Event('login'));
+const login = async (username: string, password: string) => {
+  setIsLoading(true);
+  setError(null);
+  try {
+    const userData = await loginApi(username, password); // your API call
+    const userDetails = await fetchUserDetails(userData.token);
 
+    setUser({ ...userData, bookmarks: userDetails.bookmarks });
+    localStorage.setItem('token', userData.token);
+    localStorage.setItem('username', userData.username);
+    window.dispatchEvent(new Event('login'));
 
-      // Setup auto logout based on token exp
-      const payload = JSON.parse(atob(userData.token.split('.')[1]));
-      if (payload.exp) {
-        scheduleAutoLogout(payload.exp * 1000);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to login');
-    } finally {
-      setIsLoading(false);
+    // Setup auto logout
+    const payload = JSON.parse(atob(userData.token.split('.')[1]));
+    if (payload.exp) {
+      scheduleAutoLogout(payload.exp * 1000);
     }
-  };
+
+    // Redirect to dashboard or home on successful login
+    navigate('/');  // <-- use useNavigate hook to redirect
+  } catch (err: any) {
+   
+    if (err.response && err.response.status === 400) {
+      setError('Incorrect username or password');
+    } else {
+      setError(err.message || 'Failed to login');
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   // Signup - similar to login but maybe no bookmarks yet
  const signup = async (username: string, password: string) => {

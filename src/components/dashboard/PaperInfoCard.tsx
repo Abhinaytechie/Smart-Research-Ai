@@ -13,13 +13,9 @@ const PaperInfoCard: React.FC<PaperInfoCardProps> = ({ paper }) => {
   const { setCurrentPaper } = usePaperContext();
   const { addBookmark, removeBookmark, user } = useAuth();
 
-  // Format the date
   const formattedDate = formatDate(paper.uploadDate);
-
-  // Determine if the current paper is already bookmarked
   const isBookmarked = user?.bookmarks?.some(b => b.id === paper.id);
 
-  // Toggle bookmark status
   const toggleBookmark = async () => {
     if (isBookmarked) {
       await removeBookmark(paper.id);
@@ -29,35 +25,39 @@ const PaperInfoCard: React.FC<PaperInfoCardProps> = ({ paper }) => {
   };
 
   return (
-    <div className="w-full bg-gray-900 rounded-xl border border-gray-800 shadow-xl overflow-hidden transition-all duration-300 hover:border-orange-500/30">
-      <div className="p-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">{paper.title}</h2>
-            <div className="flex flex-wrap gap-1 mb-3">
+    <div className="w-full bg-gray-900 rounded-xl border border-gray-800 shadow-lg overflow-hidden transition-all duration-300 hover:border-orange-500/40">
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+          {/* Left: Title, Authors, Date */}
+          <div className="flex-1">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">{paper.title}</h2>
+            <div className="flex flex-wrap gap-2 mb-2">
               {paper.authors.map((author, index) => (
                 <span
                   key={index}
-                  className="text-sm bg-gray-800 text-gray-300 px-2 py-1 rounded"
+                  className="text-xs sm:text-sm bg-gray-800 text-gray-300 px-2 py-1 rounded"
                 >
                   {author}
                 </span>
               ))}
             </div>
-            <p className="text-gray-400 text-sm">Uploaded on {formattedDate}</p>
+            <p className="text-gray-400 text-xs sm:text-sm">Uploaded on {formattedDate}</p>
           </div>
 
-          <button
-            onClick={toggleBookmark}
-            className="text-gray-400 hover:text-orange-500 transition-colors duration-300"
-            aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
-          >
-            {isBookmarked ? (
-              <Bookmark size={24} className="fill-orange-500 text-orange-500" />
-            ) : (
-              <BookmarkIcon size={24} />
-            )}
-          </button>
+          {/* Right: Bookmark */}
+          <div className="flex-shrink-0">
+            <button
+              onClick={toggleBookmark}
+              className="text-gray-400 hover:text-orange-500 transition-colors duration-300"
+              aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+            >
+              {isBookmarked ? (
+                <Bookmark size={24} className="fill-orange-500 text-orange-500" />
+              ) : (
+                <BookmarkIcon size={24} />
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

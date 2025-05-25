@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Menu, Upload, BookmarkIcon, NotebookIcon, X, LogIn } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext'; // Adjust this import path
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -11,41 +12,38 @@ const Navbar: React.FC = () => {
 
   const desktopDropdownRef = useRef<HTMLDivElement>(null);
   const desktopDropdownBtnRef = useRef<HTMLButtonElement>(null);
-
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileDropdownBtnRef = useRef<HTMLButtonElement>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const username = user?.username ?? 'User';
 
-  // Scroll effect
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Sync login state on localStorage change (for multi-tab)
   useEffect(() => {
     const handleStorageChange = () => setLoggedIn(!!localStorage.getItem('token'));
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
   useEffect(() => {
-  const handleLogin = () => setLoggedIn(true);
-  window.addEventListener('login', handleLogin);
-  return () => window.removeEventListener('login', handleLogin);
-}, []);
+    const handleLogin = () => setLoggedIn(true);
+    window.addEventListener('login', handleLogin);
+    return () => window.removeEventListener('login', handleLogin);
+  }, []);
 
-
-  // Close all menus on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setDesktopDropdownOpen(false);
     setMobileDropdownOpen(false);
   }, [location.pathname]);
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -74,7 +72,6 @@ const Navbar: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [desktopDropdownOpen, mobileDropdownOpen]);
 
-  // Keyboard handlers for dropdown buttons
   const handleDesktopKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -111,39 +108,42 @@ const Navbar: React.FC = () => {
     navigate('/auth');
   }, [navigate]);
 
-  const initial = "U";
+  const getInitials = (name: string | undefined) => {
+    if (!name || typeof name !== 'string') return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+
+  const initial = useMemo(() => getInitials(username), [username]);
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-black/90 backdrop-blur-sm shadow-md' : 'bg-transparent'
+        isScrolled ? 'bg-black/90 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center mr-2">
-                <span className="text-black font-bold text-xl">R</span>
-              </div>
-              <span className="text-white font-semibold text-xl hidden md:block">
-                Research<span className="text-orange-500">AI</span>
-              </span>
+          <Link to="/" className="flex items-center select-none">
+            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center mr-2">
+              <span className="text-black font-bold text-xl">R</span>
             </div>
+            <span className="text-white font-semibold text-xl hidden md:block">
+              Research<span className="text-orange-500">AI</span>
+            </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-1 items-center">
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex space-x-2 items-center">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                
-                className={`px-4 py-2 rounded-lg flex items-center transition-all duration-300 ${
+                className={`px-4 py-2 rounded-lg flex items-center transition-colors duration-300 focus:outline-none focus:ring-orange-500 ${
                   isActive(link.path)
-                    ? 'text-orange-500'
-                    : 'text-gray-400 hover:text-orange-400 animation'
+                    ? 'text-orange-500 border-b-2 border-orange-500'
+                    : 'text-gray-400 hover:text-orange-400'
                 }`}
               >
                 <span className="mr-2">{link.icon}</span>
@@ -151,11 +151,10 @@ const Navbar: React.FC = () => {
               </Link>
             ))}
 
-            {/* Auth/Profile Section */}
             {!loggedIn ? (
               <Link
                 to="/auth"
-                className="px-4 py-2 rounded-lg flex items-center text-gray-400 hover:text-orange-400 transition"
+                className="px-4 py-2 rounded-lg flex items-center text-gray-400 hover:text-orange-400 transition focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <LogIn size={20} className="mr-2" />
                 Signup
@@ -166,36 +165,36 @@ const Navbar: React.FC = () => {
                   ref={desktopDropdownBtnRef}
                   onClick={() => setDesktopDropdownOpen(!desktopDropdownOpen)}
                   onKeyDown={handleDesktopKeyDown}
-                  className="p-2 rounded-full hover:bg-gray-800 transition focus:outline-none"
+                  className="p-2 rounded-full hover:bg-gray-800 transition focus:outline-none focus:ring-2 focus:ring-orange-500"
                   aria-haspopup="true"
                   aria-expanded={desktopDropdownOpen}
                   aria-label="Profile menu"
+                  title={`Logged in as ${username}`}
                 >
-                  <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold">
+                  <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold select-none shadow-md">
                     {initial}
                   </div>
                 </button>
 
                 <div
-                  className={`absolute right-0 mt-2 w-40 bg-gray-900 rounded shadow-lg py-2 z-50 transform transition-all duration-200 origin-top-right
-                  ${desktopDropdownOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
+                  className={`absolute right-0 mt-2 w-40 bg-gray-900 rounded-lg shadow-lg py-2 z-50 transition-transform duration-200 origin-top-right ${
+                    desktopDropdownOpen
+                      ? 'scale-100 opacity-100'
+                      : 'scale-95 opacity-0 pointer-events-none'
+                  }`}
                   role="menu"
                   aria-hidden={!desktopDropdownOpen}
                 >
                   <Link
-                    to="/profile" 
+                    to="/profile"
                     className="block px-4 py-2 hover:bg-gray-700 transition"
                     onClick={() => setDesktopDropdownOpen(false)}
-                    role="menuitem"
-                    tabIndex={desktopDropdownOpen ? 0 : -1}
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 hover:bg-gray-700 transition"
-                    role="menuitem"
-                    tabIndex={desktopDropdownOpen ? 0 : -1}
                   >
                     Logout
                   </button>
@@ -204,47 +203,47 @@ const Navbar: React.FC = () => {
             )}
           </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Toggle */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg text-gray-400 hover:text-orange-500 focus:outline-none"
+              className="p-2 rounded-md text-white hover:text-orange-400 hover:bg-gray-800 transition duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
               aria-label="Toggle mobile menu"
               aria-expanded={isMobileMenuOpen}
             >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Navigation */}
-      <div
-        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-          isMobileMenuOpen ? 'max-h-96 opacity-100 border-b border-gray-800 bg-black' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <nav className="container mx-auto px-4 py-3 space-y-2">
+        {/* Mobile Nav */}
+        <nav
+          className={`md:hidden fixed top-16 left-0 right-0 bottom-0 bg-black/90 backdrop-blur-sm flex flex-col space-y-1 py-4 px-6 z-40 transform transition-transform duration-300 ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+          aria-label="Mobile navigation"
+        >
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`py-3 px-4 rounded-lg flex items-center transition-all duration-300 ${
+              className={`flex items-center px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors duration-200 ${
                 isActive(link.path)
-                  ? 'bg-gray-800 text-orange-500'
-                  : 'text-gray-400 hover:text-orange-400 hover:bg-gray-900/60'
+                  ? 'bg-orange-600 text-white'
+                  : 'text-gray-400 hover:bg-gray-700 hover:text-orange-400'
               }`}
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               <span className="mr-3">{link.icon}</span>
               {link.label}
             </Link>
           ))}
 
-          {/* Mobile Auth/Profile */}
           {!loggedIn ? (
             <Link
               to="/auth"
-              className="py-3 px-4 rounded-lg flex items-center text-gray-400 hover:text-orange-400 hover:bg-gray-900/60 transition"
+              className="flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               <LogIn size={20} className="mr-3" />
               Signup
@@ -255,37 +254,60 @@ const Navbar: React.FC = () => {
                 ref={mobileDropdownBtnRef}
                 onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
                 onKeyDown={handleMobileKeyDown}
-                className="flex items-center p-3 rounded-lg w-full hover:bg-gray-800 transition focus:outline-none"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
                 aria-haspopup="true"
                 aria-expanded={mobileDropdownOpen}
                 aria-label="Profile menu"
               >
-                <div className="w-7 h-7 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold">
-                  {initial}
+                <div className="flex items-center">
+                  <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold select-none shadow-md mr-3">
+                    {initial}
+                  </div>
+                  <span>{username}</span>
                 </div>
-                <span className="ml-2 text-gray-400">Profile</span>
+                <svg
+                  className={`transform transition-transform duration-200 ${
+                    mobileDropdownOpen ? 'rotate-180' : ''
+                  }`}
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </button>
 
               <div
-                className={`mt-2 w-full bg-gray-900 rounded shadow-lg py-2 z-50 transform transition-all duration-200 origin-top
-                ${mobileDropdownOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
+                className={`mt-2 bg-gray-900 rounded-lg shadow-lg py-2 z-50 transition-transform duration-200 origin-top-right ${
+                  mobileDropdownOpen
+                    ? 'scale-100 opacity-100'
+                    : 'scale-95 opacity-0 pointer-events-none'
+                }`}
                 role="menu"
                 aria-hidden={!mobileDropdownOpen}
               >
                 <Link
                   to="/profile"
                   className="block px-4 py-2 hover:bg-gray-700 transition"
-                  onClick={() => setMobileDropdownOpen(false)}
-                  role="menuitem"
-                  tabIndex={mobileDropdownOpen ? 0 : -1}
+                  onClick={() => {
+                    setMobileDropdownOpen(false);
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
                   Profile
                 </Link>
                 <button
-                  onClick={handleLogout}
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
                   className="w-full text-left px-4 py-2 hover:bg-gray-700 transition"
-                  role="menuitem"
-                  tabIndex={mobileDropdownOpen ? 0 : -1}
                 >
                   Logout
                 </button>
