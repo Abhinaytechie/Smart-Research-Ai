@@ -1,29 +1,14 @@
-// src/pages/Home.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/common/Button';
 import { Sparkles, Upload, UserPlus } from 'lucide-react';
 
 const HomePage: React.FC = () => {
-  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-  e.preventDefault();
-  const targetId = e.currentTarget.getAttribute('href')?.slice(1);
-  if (targetId) {
-    const el = document.getElementById(targetId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
-};
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-[#0d0c0c] via-65% to-blue-700/80 to-90% text-white flex flex-col relative">
-      {/* Mobile Navigation Anchors */}
-      <div className="md:hidden flex gap-4 justify-center text-sm mt-4 px-4">
-  <a href="#features" onClick={handleAnchorClick} className="text-orange-400 underline">Features</a>
-  <a href="#how-it-works" onClick={handleAnchorClick} className="text-orange-400 underline">How It Works</a>
-  <a href="#audience" onClick={handleAnchorClick} className="text-orange-400 underline">Audience</a>
-</div>
-
+      
 
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-20 flex-1 flex flex-col items-center justify-center text-center">
@@ -52,7 +37,7 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Feature Highlights */}
-        <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 animate-fadeInUp">
+        <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 animate-fadeInUp scroll-mt-16">
           {[
             {
               title: 'Summarize Instantly',
@@ -82,7 +67,7 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* How It Works */}
-        <div id="how-it-works" className="mt-24 max-w-5xl w-full text-center">
+        <div id="how-it-works" className="mt-24 max-w-5xl w-full text-center scroll-mt-16">
           <h2 className="text-3xl font-bold mb-6">How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left bg-[#121212] p-6 rounded-2xl shadow-inner border border-gray-800">
             {[
@@ -114,10 +99,8 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        
-
         {/* Audience */}
-        <div id="audience" className="mt-24 text-center max-w-4xl mx-auto">
+        <div id="audience" className="mt-24 text-center max-w-4xl mx-auto scroll-mt-16">
           <h2 className="text-3xl font-bold mb-4">Built for Every Researcher</h2>
           <p className="text-gray-400 text-lg mb-6">
             Whether you're a first-year undergrad, a PhD scholar, or a professor shaping the next generation, our tool is designed to adapt to your needs and elevate your research game.
