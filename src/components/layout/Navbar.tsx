@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Menu, Upload, BookmarkIcon, History, X, LogIn } from 'lucide-react';
+import { Menu, Upload, BookmarkIcon, NotebookIcon, X, LogIn } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { label: 'Dashboard', path: '/dashboard', icon: <Upload size={20} /> },
     { label: 'Bookmarks', path: '/bookmarks', icon: <BookmarkIcon size={20} /> },
-    { label: 'History', path: '/history', icon: <History size={20} /> },
+    { label: 'Notes', path: '/notes', icon: <NotebookIcon size={20} /> },
   ];
 
   const isActive = (path: string) => location.pathname === path;

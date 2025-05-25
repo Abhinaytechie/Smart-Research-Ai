@@ -21,33 +21,34 @@ const Auth: React.FC = () => {
         await signup(username, password);
         navigate('/auth');
       }
-      
     } catch (err: any) {
       console.error('Authentication error:', err.message || err);
       navigate('/auth');
-      // You can also set error state here if needed
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="relative bg-gray-900/50 backdrop-blur-xl rounded-2xl border border-gray-800/50 p-8 shadow-2xl">
-          <div className="absolute inset-0 rounded-2xl overflow-hidden">
-            <div className="absolute -inset-[500px] bg-orange-500/20 blur-[100px]" />
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950 text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md relative z-10">
+        <div className="relative bg-gray-900/60 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-8 shadow-2xl overflow-hidden">
+          {/* Soft glow behind the form */}
+          <div className="absolute inset-0 z-0">
+            <div className="absolute -inset-[400px] bg-orange-500/20 blur-[120px]" />
           </div>
 
-          <div className="relative">
+          <div className="relative z-10">
+            {/* Logo and Branding */}
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-orange-500/20 transform hover:scale-105 transition-transform duration-300">
-                <span className="text-black font-bold text-3xl">R</span>
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-orange-500/30 hover:scale-105 transform transition duration-300">
+                <span className="text-black font-extrabold text-3xl tracking-tight">R</span>
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent drop-shadow">
                 Research<span className="text-orange-500">AI</span>
               </h1>
-              <p className="text-gray-400 mt-2">Your intelligent research companion</p>
+              <p className="text-gray-400 text-sm mt-2">Your intelligent research companion</p>
             </div>
 
+            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl p-4 text-sm animate-fadeIn">
@@ -56,12 +57,13 @@ const Auth: React.FC = () => {
               )}
 
               <div className="space-y-4">
-                <div className="relative">
+                {/* Username */}
+                <div>
                   <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
                     Username
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 pointer-events-none">
                       <User size={18} />
                     </div>
                     <input
@@ -78,12 +80,13 @@ const Auth: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="relative">
+                {/* Password */}
+                <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                     Password
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 pointer-events-none">
                       <Lock size={18} />
                     </div>
                     <input
@@ -101,21 +104,23 @@ const Auth: React.FC = () => {
                 </div>
               </div>
 
+              {/* Button */}
               <Button
                 type="secondary"
                 fullWidth
                 isLoading={isLoading}
                 icon={isLogin ? <LogIn size={18} /> : <UserPlus size={18} />}
-                className="py-3"
+                className="py-3 font-semibold tracking-wide"
               >
                 {isLogin ? 'Sign In' : 'Create Account'}
               </Button>
             </form>
 
+            {/* Switch Auth Mode */}
             <div className="mt-6 text-center">
               <button
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-orange-400 hover:text-orange-300 text-sm transition-colors duration-300"
+                className="text-orange-400 hover:text-orange-300 text-sm font-medium transition-colors duration-300"
                 type="button"
               >
                 {isLogin

@@ -5,11 +5,12 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
 import Dashboard from './pages/Dashboard';
 import Bookmarks from './pages/Bookmarks';
-import History from './pages/History';
+
 import Auth from './pages/Auth';
 import HomePage from './pages/HomePage';
 import UserProfile from './pages/UserProfile';
 import PaperDetails from './pages/PaperDetails';
+import MarkdownPreviewer from './pages/MarkdownPreviwer';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -75,14 +76,14 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/history"
+        path="/notes"
         element={
-          <ProtectedRoute>
+         
             <>
               <Navbar />
-              <History />
+              <MarkdownPreviewer key={location.key}/>
             </>
-          </ProtectedRoute>
+          
         }
       />
     </Routes>
