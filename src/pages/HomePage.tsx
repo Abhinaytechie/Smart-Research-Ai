@@ -12,7 +12,7 @@ const HomePage: React.FC = () => {
         <div className="mb-10 animate-fadeIn">
           <div className="inline-flex items-center px-3 py-1 bg-orange-600/20 border border-orange-500/30 text-sm rounded-full mb-6">
             <Sparkles className="w-4 h-4 mr-2 text-orange-500" />
-            Now with AI-Powered Code Extraction
+            Bringing you AI Research Platform
           </div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight mb-6">
