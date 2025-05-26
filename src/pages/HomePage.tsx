@@ -14,6 +14,20 @@ const HomePage: React.FC = () => {
             <Sparkles className="w-4 h-4 mr-2 text-orange-500" />
             Bringing you AI Research Platform
           </div>
+          <div className="mb-6 flex justify-center">
+  <a
+    href="https://www.producthunt.com/posts/research-ai-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-research-ai-3"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <img
+      src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=969878&theme=dark"
+      alt="Research AI - Turn Papers into Insights – Instantly | Product Hunt"
+      width="250"
+      height="54"
+    />
+  </a>
+</div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight mb-6">
             Meet Your <span className="text-orange-500">Smart Research Assistant</span>
