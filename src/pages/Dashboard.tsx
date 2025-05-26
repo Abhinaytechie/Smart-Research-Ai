@@ -18,6 +18,11 @@ const Dashboard: React.FC = () => {
 
   const handleFileUpload = async (file: File) => {
   if (!file) return;
+  const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
+  if (file.size > maxSizeInBytes) {
+    alert('File size exceeds 1MB. Please upload a smaller PDF for now.');
+    return;
+  }
 
   setIsUploading(true);
   try {
