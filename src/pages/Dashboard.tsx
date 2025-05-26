@@ -6,7 +6,8 @@ import PaperInfoCard from '../components/dashboard/PaperInfoCard';
 import ActionButtons from '../components/dashboard/ActionButtons';
 import ResultCard from '../components/common/ResultCard';
 import Chatbot from '../components/chatbot/Chatbot';
-
+import { notoSansBase64 } from '../utils/base64';
+import { extractLinesAndRebuildPDF } from '../utils/pdfProcess';
 
 
 const Dashboard: React.FC = () => {
@@ -16,17 +17,28 @@ const Dashboard: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (file: File) => {
+
+
+
+
+
+
+const handleFileUpload = async (file: File) => {
   if (!file) return;
-  const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
-  if (file.size > maxSizeInBytes) {
-    alert('File size exceeds 1MB. Please upload a smaller PDF for now.');
-    return;
-  }
 
   setIsUploading(true);
   try {
-    await uploadPaper(file); // Just call context method
+    let processedFile = file;
+
+    if (file.size > 1 * 1024 * 1024) {
+      // Compress and strip images if file is bigger than 1MB
+      processedFile = await extractLinesAndRebuildPDF(file,notoSansBase64);
+     
+        setIsUploading(false);
+        
+    }
+
+    await uploadPaper(processedFile);
   } catch (error) {
     console.error('Error uploading file:', error);
     alert('Failed to upload file');
@@ -34,6 +46,7 @@ const Dashboard: React.FC = () => {
     setIsUploading(false);
   }
 };
+
 
 
   const handleDragOver = (e: React.DragEvent) => {
